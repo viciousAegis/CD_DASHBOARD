@@ -37,7 +37,7 @@ function ForceGraph({
     const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
     const LOC = nodeGeolocation == null ? null : d3.map(nodes, nodeGeolocation);
 
-    console.log("nodes",LOC);
+    console.log("nodes", LOC);
 
     // Replace the input nodes and links with mutable objects for the simulation.
     nodes = d3.map(nodes, (_, i) => ({ id: N[i], group: G && G[i], location: LOC && LOC[i] }));
@@ -66,20 +66,13 @@ function ForceGraph({
         .attr("height", height)
         .attr("viewBox", [-width / 2, -height / 2, width, height])
         .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
-        .call(d3.zoom()
-            .scaleExtent([1 / 2, 8]) // Limit zoom scale
-            .on("zoom", zoomed)); // Call zoomed function on zoom event
-    
-    // Append a container for the graph elements (links and nodes)
-    const container = svg.append("g");
-    
-    // Append links and nodes to the container as before
-    
-    function zoomed(event) {
-        container.attr("transform", event.transform); // Apply zoom transform to container
-    }
+        .call(d3.zoom().on("zoom", function (event) {
+            container.attr("transform", event.transform);
+        }));
 
-    const link = svg.append("g")
+    const container = svg.append("g");
+
+    const link = container.append("g")
         .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
         .attr("stroke-opacity", linkStrokeOpacity)
         .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
@@ -88,7 +81,7 @@ function ForceGraph({
         .data(links)
         .join("line");
 
-    const node = svg.append("g")
+    const node = container.append("g")
         .attr("fill", nodeFill)
         .attr("stroke", nodeStroke)
         .attr("stroke-opacity", nodeStrokeOpacity)
@@ -98,7 +91,7 @@ function ForceGraph({
         .join("circle")
         .attr("r", nodeRadius)
         .call(drag(simulation))
-        .on("mouseover", add_tooltip)
+        .on("mouseover", persist_tooltip)
         .on("mouseout", remove_tooltip)
         .on("click", persist_tooltip);
 
@@ -150,46 +143,74 @@ function ForceGraph({
     }
 
     const tooltip = svg.append('g')
-            .attr('class', 'tooltip')
-            .attr('transform', `translate(${width / 4}, -${height / 2})`)
+        .attr('class', 'tooltip')
+        .attr('transform', `translate(${width / 4}, -${height / 2})`);
 
     tooltip.append('rect')
         .attr('width', 150)
         .attr('height', 70)
         .attr('fill', 'white')
-        .attr('stroke', '#333')
+        .attr('stroke', '#333');
 
+    // function add_tooltip(event, d) {
+    //     console.log("Node clicked:", d); // Log the details of the clicked node to the console
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 20)
+    //         .text(`ID: ${d.id}`);
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 40)
+    //         .text(`Group: ${d.group}`);
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 60)
+    //         .text(`Location: ${d.location}`);
+    //     console.log(tooltip);
+    // }
     function add_tooltip(event, d) {
-        console.log("Node clicked:", d); // Log the details of the clicked node to the console
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 20)
-            .text(`ID: ${d.id}`)
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 40)
-            .text(`Group: ${d.group}`)
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 60)
-            .text(`Location: ${d.location}`)
-        console.log(tooltip)
+        const tooltip = d3.select("#tooltip");
+        tooltip.html(`<strong>ID:</strong> ${d.id}<br><strong>Group:</strong> ${d.group}<br><strong>Location:</strong> ${d.location}`);
+        tooltip.style("left", event.pageX + "px")
+               .style("top", event.pageY + "px")
+               .style("display", "block");
     }
-
+    
+    function remove_tooltip() {
+        d3.select("#tooltip").style("display", "none");
+    }
+    
     function persist_tooltip(event, d) {
-        add_tooltip(event, d)
-        // make sure mouseout doesn't remove the tooltip
-        tooltip.on('mouseout', () => {})
+        add_tooltip(event, d);
     }
+    // function persist_tooltip(event, d) {
+    //     // Call the add_tooltip function
+    //     add_tooltip(event, d);
+    // }
+    
+    // function remove_tooltip(event, d) {
+    //     // Clear any existing text
+    //     tooltip.selectAll('text').remove();
+    
+    //     // Hide the tooltip
+    //     tooltip.style('display', 'none');
+    // }
+    
 
-    function remove_tooltip(event, d) {
-        tooltip.selectAll('text').remove()
-    }
+    // function persist_tooltip(event, d) {
+    //     add_tooltip(event, d);
+    //     // make sure mouseout doesn't remove the tooltip
+    //     tooltip.on('mouseout', () => {});
+    // }
+
+    // function remove_tooltip(event, d) {
+    //     tooltip.selectAll('text').remove();
+    // }
 
     return Object.assign(svg.node(), { scales: { color } });
 }
 
-d3.json("./bollywood.json").then(function(jsonData) {
+d3.json("./bollywood.json").then(function (jsonData) {
     console.log("JSON data fetched:", jsonData);
     // Create D3.js chart with fetched JSON data
     const chart = ForceGraph(jsonData, {
@@ -199,11 +220,13 @@ d3.json("./bollywood.json").then(function(jsonData) {
         nodeTitle: d => `${d.id}\n${d.group}`,
         linkStrokeWidth: l => Math.sqrt(l.weight),
     });
-    
+
     // Select the chart container and append the chart to it
     d3.select("#chart").append(() => chart);
 
-}).catch(function(error) {
+}).catch(function (error) {
     // Handle errors if any
     console.error("Error fetching JSON data:", error);
 });
+
+
