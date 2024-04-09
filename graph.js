@@ -37,7 +37,7 @@ function ForceGraph({
     const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
     const LOC = nodeGeolocation == null ? null : d3.map(nodes, nodeGeolocation);
 
-    console.log("nodes",LOC);
+    console.log("nodes", LOC);
 
     // Replace the input nodes and links with mutable objects for the simulation.
     nodes = d3.map(nodes, (_, i) => ({ id: N[i], group: G && G[i], location: LOC && LOC[i] }));
@@ -66,20 +66,13 @@ function ForceGraph({
         .attr("height", height)
         .attr("viewBox", [-width / 2, -height / 2, width, height])
         .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
-        .call(d3.zoom()
-            .scaleExtent([1 / 2, 8]) // Limit zoom scale
-            .on("zoom", zoomed)); // Call zoomed function on zoom event
-    
-    // Append a container for the graph elements (links and nodes)
-    const container = svg.append("g");
-    
-    // Append links and nodes to the container as before
-    
-    function zoomed(event) {
-        container.attr("transform", event.transform); // Apply zoom transform to container
-    }
+        .call(d3.zoom().on("zoom", function (event) {
+            container.attr("transform", event.transform);
+        }));
 
-    const link = svg.append("g")
+    const container = svg.append("g");
+
+    const link = container.append("g")
         .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
         .attr("stroke-opacity", linkStrokeOpacity)
         .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
@@ -88,7 +81,7 @@ function ForceGraph({
         .data(links)
         .join("line");
 
-    const node = svg.append("g")
+    const node = container.append("g")
         .attr("fill", nodeFill)
         .attr("stroke", nodeStroke)
         .attr("stroke-opacity", nodeStrokeOpacity)
@@ -150,8 +143,8 @@ function ForceGraph({
     }
 
     const tooltip = svg.append('g')
-            .attr('class', 'tooltip')
-            .attr('transform', `translate(${width / 4}, -${height / 2})`)
+        .attr('class', 'tooltip')
+        .attr('transform', `translate(${width / 4}, -${height / 2})`)
 
     tooltip.append('rect')
         .attr('width', 150)
@@ -189,7 +182,7 @@ function ForceGraph({
     return Object.assign(svg.node(), { scales: { color } });
 }
 
-d3.json("./bollywood.json").then(function(jsonData) {
+d3.json("./bollywood.json").then(function (jsonData) {
     console.log("JSON data fetched:", jsonData);
     // Create D3.js chart with fetched JSON data
     const chart = ForceGraph(jsonData, {
@@ -199,11 +192,13 @@ d3.json("./bollywood.json").then(function(jsonData) {
         nodeTitle: d => `${d.id}\n${d.group}`,
         linkStrokeWidth: l => Math.sqrt(l.weight),
     });
-    
+
     // Select the chart container and append the chart to it
     d3.select("#chart").append(() => chart);
 
-}).catch(function(error) {
+}).catch(function (error) {
     // Handle errors if any
     console.error("Error fetching JSON data:", error);
 });
+
+
