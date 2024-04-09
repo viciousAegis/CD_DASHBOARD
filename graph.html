@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Development -->
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+
+    <!-- Production -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<body style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
+    <div id="chart"
+        style="border: 1px solid black; padding: 10px; align-items: center; justify-content: center; display: flex; flex-direction: column;">
+    </div>
+
+    <div class="container">
+        <table class="table table-striped p-10" id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Group</th>
+                    <th>Location</th>
+                    <th>Is Influencer</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Table rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="graph.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to populate table with JSON data
+            function populateTable(data) {
+                var tableBody = $('#tableBody');
+                $.each(data.nodes, function (index, item) {
+                    var row = '<tr>' +
+                        '<td>' + item.id + '</td>' +
+                        '<td>' + item.group + '</td>' +
+                        '<td>' + item.location + '</td>' +
+                        '<td>' + item.isInfluencer + '</td>' +
+                        '</tr>';
+                    tableBody.append(row);
+                });
+            }
+
+            // Load JSON data from file
+            $.ajax({
+                url: 'bollywood.json',
+                dataType: 'json',
+                success: function (data) {
+                    populateTable(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading JSON file:', error);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
