@@ -91,7 +91,7 @@ function ForceGraph({
         .join("circle")
         .attr("r", nodeRadius)
         .call(drag(simulation))
-        .on("mouseover", add_tooltip)
+        .on("mouseover", persist_tooltip)
         .on("mouseout", remove_tooltip)
         .on("click", persist_tooltip);
 
@@ -144,40 +144,68 @@ function ForceGraph({
 
     const tooltip = svg.append('g')
         .attr('class', 'tooltip')
-        .attr('transform', `translate(${width / 4}, -${height / 2})`)
+        .attr('transform', `translate(${width / 4}, -${height / 2})`);
 
     tooltip.append('rect')
         .attr('width', 150)
         .attr('height', 70)
         .attr('fill', 'white')
-        .attr('stroke', '#333')
+        .attr('stroke', '#333');
 
+    // function add_tooltip(event, d) {
+    //     console.log("Node clicked:", d); // Log the details of the clicked node to the console
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 20)
+    //         .text(`ID: ${d.id}`);
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 40)
+    //         .text(`Group: ${d.group}`);
+    //     tooltip.append('text')
+    //         .attr('x', 5)
+    //         .attr('y', 60)
+    //         .text(`Location: ${d.location}`);
+    //     console.log(tooltip);
+    // }
     function add_tooltip(event, d) {
-        console.log("Node clicked:", d); // Log the details of the clicked node to the console
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 20)
-            .text(`ID: ${d.id}`)
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 40)
-            .text(`Group: ${d.group}`)
-        tooltip.append('text')
-            .attr('x', 5)
-            .attr('y', 60)
-            .text(`Location: ${d.location}`)
-        console.log(tooltip)
+        const tooltip = d3.select("#tooltip");
+        tooltip.html(`<strong>ID:</strong> ${d.id}<br><strong>Group:</strong> ${d.group}<br><strong>Location:</strong> ${d.location}`);
+        tooltip.style("left", event.pageX + "px")
+               .style("top", event.pageY + "px")
+               .style("display", "block");
     }
-
+    
+    function remove_tooltip() {
+        d3.select("#tooltip").style("display", "none");
+    }
+    
     function persist_tooltip(event, d) {
-        add_tooltip(event, d)
-        // make sure mouseout doesn't remove the tooltip
-        tooltip.on('mouseout', () => {})
+        add_tooltip(event, d);
     }
+    // function persist_tooltip(event, d) {
+    //     // Call the add_tooltip function
+    //     add_tooltip(event, d);
+    // }
+    
+    // function remove_tooltip(event, d) {
+    //     // Clear any existing text
+    //     tooltip.selectAll('text').remove();
+    
+    //     // Hide the tooltip
+    //     tooltip.style('display', 'none');
+    // }
+    
 
-    function remove_tooltip(event, d) {
-        tooltip.selectAll('text').remove()
-    }
+    // function persist_tooltip(event, d) {
+    //     add_tooltip(event, d);
+    //     // make sure mouseout doesn't remove the tooltip
+    //     tooltip.on('mouseout', () => {});
+    // }
+
+    // function remove_tooltip(event, d) {
+    //     tooltip.selectAll('text').remove();
+    // }
 
     return Object.assign(svg.node(), { scales: { color } });
 }
