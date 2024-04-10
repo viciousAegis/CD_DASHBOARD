@@ -18,37 +18,57 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Document</title>
     <link rel="stylesheet" href="graph.css">
+    <style>
+        #mainBody {
+            height: 100vh;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="chart"
-        style="border: 1px solid black; padding: 10px; align-items: center; justify-content: center; display: flex; flex-direction: column;">
-    </div>
-    <div id="tooltip" style="position: absolute; display: none; background-color: white; border: 1px solid black; padding: 5px;"></div>
-
-    <div class="container">
-        <div class="table-wrapper">
-            <table class="table table-striped" id="dataTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th class="group-header">
-                            <div class="group-title">Group</div>
-                            <div class="button-container">
-                                <button id="sortButton" class="button-47" role="button">
-                                    <span class="text">Sort</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>Location</th>
-                        <th>Is Influencer</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Table rows will be added here dynamically -->
-                </tbody>
-            </table>
+    <div id='mainBody' class="container-fluid" style="margin: 0 auto;">
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <h1 class="text-center">Community Detection and Influencer Identification</h1>
+            </div>
         </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div id="chart" class="shadow p-3 mb-5 bg-white rounded">
+                </div>
+                <div id="tooltip"
+                    style="position: absolute; display: none; background-color: white; border: 1px solid black; padding: 5px;">
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="table-wrapper">
+                    <table class="table table-striped" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>
+                                    <div>Group</div>
+                                    <!-- <div class="button-container">
+                                    <button id="sortButton" class="button-text" role="button">
+                                        <span class="text">Sort</span>
+                                    </button>
+                                </div> -->
+                                </th>
+                                <th>Location</th>
+                                <th>Is Influencer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Table rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="graph.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -73,7 +93,7 @@
 
             // Load JSON data from file
             $.ajax({
-                url: 'bollywood.json',
+                url: '2024electionindia.json',
                 dataType: 'json',
                 success: function (data) {
                     populateTable(data);
@@ -84,31 +104,31 @@
             });
         });
 
-            // Sort button functionality
-            var ascendingOrder = true;
-            $('#sortButton').on('click', function () {
-                var rows = $('#dataTable tbody tr').get();
-                rows.sort(function (a, b) {
-                    var aValue = parseInt($(a).find('td:eq(1)').text());
-                    var bValue = parseInt($(b).find('td:eq(1)').text());
-                    if (ascendingOrder) {
-                        return aValue - bValue;
-                    } else {
-                        return bValue - aValue;
-                    }
-                });
-                $.each(rows, function (index, row) {
-                    $('#dataTable tbody').append(row);
-                });
-                // Toggle sorting order
-                ascendingOrder = !ascendingOrder;
+        // Sort button functionality
+        var ascendingOrder = true;
+        $('#sortButton').on('click', function () {
+            var rows = $('#dataTable tbody tr').get();
+            rows.sort(function (a, b) {
+                var aValue = parseInt($(a).find('td:eq(1)').text());
+                var bValue = parseInt($(b).find('td:eq(1)').text());
+                if (ascendingOrder) {
+                    return aValue - bValue;
+                } else {
+                    return bValue - aValue;
+                }
             });
+            $.each(rows, function (index, row) {
+                $('#dataTable tbody').append(row);
+            });
+            // Toggle sorting order
+            ascendingOrder = !ascendingOrder;
+        });
     </script>
 
     <style>
         .tooltip {
-    display: none;
-}
+            display: none;
+        }
     </style>
 
 </body>
