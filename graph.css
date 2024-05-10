@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 50px auto;
+    max-width: 600px; /* Adjust as needed */
+}
+
+.table-wrapper {
+    max-height: 300px; /* Set maximum height for the table */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    border: 1px solid #dee2e6;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table thead th {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* <!-- HTML !-->
+<button class="button-47" role="button">Button 47</button> */
+
+/* CSS */
+.button-47 {
+  align-items: center;
+  background: #FFFFFF;
+  border: 0 solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  color: #1A202C;
+  display: inline-flex;
+  font-family: Inter, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  height: 30px;
+  justify-content: center;
+  line-height: 24px;
+  overflow-wrap: break-word;
+  padding: 12px;
+  text-decoration: none;
+  width: auto;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-left: auto; /*Shift the button to the right */
+}
+
+.group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.group-title {
+    flex: 1; /* Take up remaining space */
+}
+
+.button-container {
+    margin-left: 10px; /* Adjust the spacing between text and button */
+}
+
+

@@ -21,8 +21,8 @@ function ForceGraph({
     linkStrokeLinecap = "round", // link stroke linecap
     linkStrength,
     colors = d3.schemeTableau10, // an array of color strings, for the node groups
-    width = 640, // outer width, in pixels
-    height = 400, // outer height, in pixels
+    width = 1600, // outer width, in pixels
+    height = 1000, // outer height, in pixels
     invalidation // when this promise resolves, stop the simulation
 } = {}) {
     // Compute values.
@@ -210,7 +210,7 @@ function ForceGraph({
     return Object.assign(svg.node(), { scales: { color } });
 }
 
-d3.json("./bollywood.json").then(function (jsonData) {
+d3.json("./2024electionindia.json").then(function (jsonData) {
     console.log("JSON data fetched:", jsonData);
     // Create D3.js chart with fetched JSON data
     const chart = ForceGraph(jsonData, {
