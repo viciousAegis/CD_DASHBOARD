@@ -40,8 +40,8 @@
         <div class="col-md-12 justify-center align-center">
             <p class="text-center">Select a graph</p>
             <select id="dropdown" >
-                <!-- <option value="bollywood" selected>Bollywood </option>
-                <option value="2024electionindia">2024 Election India </option> -->
+                <!--  <option value="bollywood" selected>Bollywood </option> -->
+                <option value="Select Option">Select</option> 
 
                 <!-- Add more options as needed -->
             </select>
@@ -168,9 +168,7 @@
             url: "http://127.0.0.1:5500/graphs/",
             success: function(data){
                 var fileList = $("#fileList");
-                fileList.html("<h2>JSON Files in the folder:</h2>");
 
-                // Parse the HTML content to extract file names
                 var fileNames = $(data).find('a').map(function() {
                     return $(this).text();
                 }).get();
