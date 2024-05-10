@@ -1,3 +1,4 @@
+
 function ForceGraph({
     nodes, // an iterable of node objects (typically [{id}, …])
     links // an iterable of link objects (typically [{source, target}, …])
@@ -210,28 +211,28 @@ function ForceGraph({
     return Object.assign(svg.node(), { scales: { color } });
 }
 
-d3.json("./2024electionindia.json").then(function (jsonData) {
-    console.log("JSON data fetched:", jsonData);
-    // Create D3.js chart with fetched JSON data
-    const chart = ForceGraph(jsonData, {
-        nodeId: d => d.id,
-        nodeGroup: d => d.group,
-        nodeGeolocation: d => d.location,
-        nodeTitle: d => `${d.id}\n${d.group}`,
-        linkStrokeWidth: l => Math.sqrt(l.weight),
-    });
+// d3.json("./2024electionindia.json").then(function (jsonData) {
+//     console.log("JSON data fetched:", jsonData);
+//     // Create D3.js chart with fetched JSON data
+//     const chart = ForceGraph(jsonData, {
+//         nodeId: d => d.id,
+//         nodeGroup: d => d.group,
+//         nodeGeolocation: d => d.location,
+//         nodeTitle: d => `${d.id}\n${d.group}`,
+//         linkStrokeWidth: l => Math.sqrt(l.weight),
+//     });
 
-    // Select the chart container and append the chart to it
-    d3.select("#chart").append(() => chart);
+//     // Select the chart container and append the chart to it
+//     d3.select("#chart").append(() => chart);
 
-}).catch(function (error) {
-    // Handle errors if any
-    console.error("Error fetching JSON data:", error);
-});
+// }).catch(function (error) {
+//     // Handle errors if any
+//     console.error("Error fetching JSON data:", error);
+// });
 
 
 function loadGraph(selectedItem) {
-    const filePath = `./${selectedItem}.json`;
+    const filePath = `./Graphs/${selectedItem}.json`;
 
     d3.json(filePath)
         .then(function (jsonData) {
@@ -258,11 +259,12 @@ function updateGraph(selectedItem) {
     loadGraph(selectedItem);
 }
 
-loadGraph("part1");
 
 const dropdown = document.getElementById("dropdown");
 
 dropdown.addEventListener("change", function() {
     const selectedItem = dropdown.value;
     updateGraph(selectedItem); 
+    loadJSON(selectedItem);
+
 });

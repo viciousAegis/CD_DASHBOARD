@@ -25,8 +25,11 @@
     </style>
 </head>
 
+
+
 <body style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
 
+    
     <div class="row mb-3">
         <div class="col-md-12">
             <h1 class="text-center">Community Detection and Influencer Identification</h1>
@@ -36,13 +39,16 @@
     <div class="row justify-center flex-column p-3 mb-3">
         <div class="col-md-12 justify-center align-center">
             <p class="text-center">Select a graph</p>
-            <select id="dropdown">
-                <option value="bollywood" selected>Bollywood </option>
-                <option value="2024electionindia">2024 Election India </option>
+            <select id="dropdown" >
+                <!--  <option value="bollywood" selected>Bollywood </option> -->
+                <option value="Select Option">Select</option> 
 
                 <!-- Add more options as needed -->
             </select>
         </div>
+    </div>
+    <div class="fileList" id="fileList">
+
     </div>
 
     <div class="row justify-content-center">
@@ -106,7 +112,8 @@
         }
 
         function loadJSON(selectedItem) {
-            var filePath = selectedItem + '.json';
+            var filePath ="./Graphs/"+selectedItem + '.json';
+            // console.log("filePath",filePath)
 
             $.ajax({
                 url: filePath,
@@ -123,12 +130,13 @@
         $(document).ready(function () {
             var dropdown = $('#dropdown');
             var selectedOption = dropdown.val();
-            loadJSON(selectedOption);
+            // loadJSON(selectedOption);
 
         })
 
         dropdown.on('change', function () {
             var selectedItem = $(this).val();
+            // console.log("selectedItem",selectedItem)
             loadJSON(selectedItem);
         });
 
@@ -153,6 +161,35 @@
         });
 
     </script>
+<script>
+  $(document).ready(function(){
+        $.ajax({
+            type: "GET",
+            url: "http://127.0.0.1:5500/graphs/",
+            success: function(data){
+                var fileList = $("#fileList");
+
+                var fileNames = $(data).find('a').map(function() {
+                    return $(this).text();
+                }).get();
+                var fileNames = fileNames.filter(function(fileName) {
+                    return fileName.endsWith('.json');
+                });
+
+                var fileOptions = $("#dropdown");
+
+fileNames.forEach(function(jsonFile){
+    jsonFile = jsonFile.replace('.json', '');
+
+    var option = $("<option></option>").text(jsonFile).val(jsonFile);
+    fileOptions.append(option);
+});
+
+                     console.log(fileNames)
+            }
+        });
+    });
+</script>
 
     <style>
         .tooltip {
