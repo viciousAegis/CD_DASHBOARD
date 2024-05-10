@@ -230,3 +230,39 @@ d3.json("./2024electionindia.json").then(function (jsonData) {
 });
 
 
+function loadGraph(selectedItem) {
+    const filePath = `./${selectedItem}.json`;
+
+    d3.json(filePath)
+        .then(function (jsonData) {
+            console.log(`JSON data fetched for ${selectedItem}:`, jsonData);
+
+            const chart = ForceGraph(jsonData, {
+                nodeId: d => d.id,
+                nodeGroup: d => d.group,
+                nodeGeolocation: d => d.location,
+                nodeTitle: d => `${d.id}\n${d.group}`,
+                linkStrokeWidth: l => Math.sqrt(l.weight),
+            });
+
+            d3.select("#chart").selectAll("*").remove();
+
+            d3.select("#chart").append(() => chart);
+        })
+        .catch(function (error) {
+            console.error(`Error fetching JSON data for ${selectedItem}:`, error);
+        });
+}
+
+function updateGraph(selectedItem) {
+    loadGraph(selectedItem);
+}
+
+loadGraph("part1");
+
+const dropdown = document.getElementById("dropdown");
+
+dropdown.addEventListener("change", function() {
+    const selectedItem = dropdown.value;
+    updateGraph(selectedItem); 
+});
