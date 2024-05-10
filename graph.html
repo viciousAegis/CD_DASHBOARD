@@ -26,53 +26,61 @@
 </head>
 
 <body style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
-    <select id="dropdown">
-        <option value="bollywood" selected>Bollywood </option>
-        <option value="2024electionindia">2024 Election  India </option>
- 
-        <!-- Add more options as needed -->
-    </select>
 
-    <div id="chart"
-        style="border: 1px solid black; padding: 10px; align-items: center; justify-content: center; display: flex; flex-direction: column;">
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h1 class="text-center">Community Detection and Influencer Identification</h1>
+        </div>
     </div>
-    <div id="tooltip" style="position: absolute; display: none; background-color: white; border: 1px solid black; padding: 5px;"></div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div id="chart" class="shadow p-3 mb-5 bg-white rounded">
-                </div>
-                <div id="tooltip"
-                    style="position: absolute; display: none; background-color: white; border: 1px solid black; padding: 5px;">
-                </div>
+    <div class="row justify-center flex-column p-3 mb-3">
+        <div class="col-md-12 justify-center align-center">
+            <p class="text-center">Select a graph</p>
+            <select id="dropdown">
+                <option value="bollywood" selected>Bollywood </option>
+                <option value="2024electionindia">2024 Election India </option>
+
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div id="chart" class="shadow p-3 mb-5 bg-white rounded">
+            </div>
+            <div id="tooltip"
+                style="position: absolute; display: none; background-color: white; border: 1px solid black; padding: 5px;">
             </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="table-wrapper">
-                    <table class="table table-striped" id="dataTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>
-                                    <div>Group</div>
-                                    <!-- <div class="button-container">
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="table-wrapper">
+                <table class="table table-striped" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>
+                                <div>Group</div>
+                                <!-- <div class="button-container">
                                     <button id="sortButton" class="button-text" role="button">
                                         <span class="text">Sort</span>
                                     </button>
                                 </div> -->
-                                </th>
-                                <th>Location</th>
-                                <th>Is Influencer</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- Table rows will be added here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+                            </th>
+                            <th>Location</th>
+                            <th>Is Influencer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Table rows will be added here dynamically -->
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="graph.js"></script>
@@ -81,74 +89,50 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        // $(document).ready(function () {
-        //     // Function to populate table with JSON data
-        //     function populateTable(data) {
-        //         var tableBody = $('#tableBody');
-        //         $.each(data.nodes, function (index, item) {
-        //             var row = '<tr>' +
-        //                 '<td>' + item.id + '</td>' +
-        //                 '<td>' + item.group + '</td>' +
-        //                 '<td>' + item.location + '</td>' +
-        //                 '<td>' + item.isInfluencer + '</td>' +
-        //                 '</tr>';
-        //             tableBody.append(row);
-        //         });
-        //     }
 
-        //     // Load JSON data from file
-        //     $.ajax({
-        //         url: 'bollywood.json',
-        //         dataType: 'json',
-        //         success: function (data) {
-        //             populateTable(data);
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error('Error loading JSON file:', error);
-        //         }
-        //     });
-        // });
+
+        function populateTable(data) {
+            var tableBody = $('#tableBody');
+            tableBody.empty();
+            $.each(data.nodes, function (index, item) {
+                var row = '<tr>' +
+                    '<td>' + item.id + '</td>' +
+                    '<td>' + item.group + '</td>' +
+                    '<td>' + item.location + '</td>' +
+                    '<td>' + item.isInfluencer + '</td>' +
+                    '</tr>';
+                tableBody.append(row);
+            });
+        }
+
+        function loadJSON(selectedItem) {
+            var filePath = selectedItem + '.json';
+
+            $.ajax({
+                url: filePath,
+                dataType: 'json',
+                success: function (data) {
+                    populateTable(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading JSON file:', error);
+                }
+            });
+        }
 
         $(document).ready(function () {
-    function populateTable(data) {
-        var tableBody = $('#tableBody');
-        tableBody.empty(); 
-        $.each(data.nodes, function (index, item) {
-            var row = '<tr>' +
-                '<td>' + item.id + '</td>' +
-                '<td>' + item.group + '</td>' +
-                '<td>' + item.location + '</td>' +
-                '<td>' + item.isInfluencer + '</td>' +
-                '</tr>';
-            tableBody.append(row);
+            var dropdown = $('#dropdown');
+            var selectedOption = dropdown.val();
+            loadJSON(selectedOption);
+
+        })
+
+        dropdown.on('change', function () {
+            var selectedItem = $(this).val();
+            loadJSON(selectedItem);
         });
-    }
 
-    function loadJSON(selectedItem) {
-        var filePath =  selectedItem + '.json';
-
-        $.ajax({
-            url: filePath,
-            dataType: 'json',
-            success: function (data) {
-                populateTable(data);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error loading JSON file:', error);
-            }
-        });
-    }
-
-    loadJSON('bollywood');
-
-    var dropdown = $('#dropdown');
-
-    dropdown.on('change', function () {
-        var selectedItem = $(this).val();
-        loadJSON(selectedItem); 
-    });
-     
-                  // Sort button functionality
+        // Sort button functionality
         var ascendingOrder = true;
         $('#sortButton').on('click', function () {
             var rows = $('#dataTable tbody tr').get();
@@ -166,8 +150,8 @@
             });
             // Toggle sorting order
             ascendingOrder = !ascendingOrder;
-   
-});
+        });
+
     </script>
 
     <style>
