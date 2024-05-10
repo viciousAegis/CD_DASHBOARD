@@ -1,3 +1,4 @@
+
 function ForceGraph({
     nodes, // an iterable of node objects (typically [{id}, …])
     links // an iterable of link objects (typically [{source, target}, …])
@@ -231,7 +232,7 @@ d3.json("./2024electionindia.json").then(function (jsonData) {
 
 
 function loadGraph(selectedItem) {
-    const filePath = `./${selectedItem}.json`;
+    const filePath = `./Graphs/${selectedItem}.json`;
 
     d3.json(filePath)
         .then(function (jsonData) {
