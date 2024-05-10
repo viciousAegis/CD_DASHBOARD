@@ -112,8 +112,8 @@
         }
 
         function loadJSON(selectedItem) {
-            var filePath ="Graphs/"+ selectedItem + '.json';
-            console.log("filePath",filePath)
+            var filePath ="./Graphs/"+selectedItem + '.json';
+            // console.log("filePath",filePath)
 
             $.ajax({
                 url: filePath,
@@ -130,13 +130,13 @@
         $(document).ready(function () {
             var dropdown = $('#dropdown');
             var selectedOption = dropdown.val();
-            loadJSON(selectedOption);
+            // loadJSON(selectedOption);
 
         })
 
         dropdown.on('change', function () {
             var selectedItem = $(this).val();
-            
+            // console.log("selectedItem",selectedItem)
             loadJSON(selectedItem);
         });
 
@@ -180,7 +180,6 @@
 
                 var fileOptions = $("#dropdown");
 
-// Create options for each JSON file
 fileNames.forEach(function(jsonFile){
     jsonFile = jsonFile.replace('.json', '');
 

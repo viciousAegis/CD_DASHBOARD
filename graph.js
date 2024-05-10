@@ -259,11 +259,12 @@ function updateGraph(selectedItem) {
     loadGraph(selectedItem);
 }
 
-loadGraph("part1");
 
 const dropdown = document.getElementById("dropdown");
 
 dropdown.addEventListener("change", function() {
     const selectedItem = dropdown.value;
     updateGraph(selectedItem); 
+    loadJSON(selectedItem);
+
 });
