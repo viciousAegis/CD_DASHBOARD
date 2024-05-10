@@ -29,7 +29,7 @@
 
 <body style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
 
-    
+
     <div class="row mb-3">
         <div class="col-md-12">
             <h1 class="text-center">Community Detection and Influencer Identification</h1>
@@ -39,11 +39,18 @@
     <div class="row justify-center flex-column p-3 mb-3">
         <div class="col-md-12 justify-center align-center">
             <p class="text-center">Select a graph</p>
-            <select id="dropdown" >
-                <!--  <option value="bollywood" selected>Bollywood </option> -->
-                <option value="Select Option">Select</option> 
+            <select id="dropdown">
+                <option value="Select Option">Select</option>
 
                 <!-- Add more options as needed -->
+            </select>
+        </div>
+        <div class="col-md-12 justify-center align-center">
+            <p class="text-center">Select a grouping</p>
+            <select id="dropdown_graph">
+                <option value="community" selected>Community</option>
+                <option value="location">Location</option>
+                <option value="influence">Influence</option>
             </select>
         </div>
     </div>
@@ -72,38 +79,6 @@
         // JavaScript code goes here
         // Fetch and display table for each attribute
         // Fetch and display table for each attribute
-['group', 'location', 'is_influencer'].forEach(attribute => {
-    fetch('bollywood.json')
-    .then(response => response.json())
-    .then(jsonData => {
-        var attributeCounts = {};
-
-        // Count occurrences of each attribute
-        jsonData.nodes.forEach(function(node) {
-            var value = node[attribute];
-
-            // If the attribute is 'is_influencer', count 'true' and 'false' separately
-            if (attribute === 'is_influencer') {
-                value = value.toString(); // Convert boolean to string for counting
-            }
-
-            attributeCounts[value] = (attributeCounts[value] || 0) + 1;
-        });
-
-        // console.log(attributeCounts);
-
-        // Generate HTML table
-        var tableHTML = "<table class='table'><thead class='thead-dark'><tr><th>" + attribute.charAt(0).toUpperCase() + attribute.slice(1) + "</th><th>Count</th></tr></thead><tbody>";
-        for (var value in attributeCounts) {
-            tableHTML += "<tr><td>" + value + "</td><td>" + attributeCounts[value] + "</td></tr>";
-        }
-        tableHTML += "</tbody></table>";
-
-        // Insert table into respective container
-        document.getElementById("table-container-" + attribute).innerHTML = tableHTML;
-    })
-    .catch(error => console.error('Error fetching JSON:', error));
-});
 
     </script>
 
@@ -115,29 +90,50 @@
     <script>
 
 
-        function populateTable(data) {
-            var tableBody = $('#tableBody');
-            tableBody.empty();
-            $.each(data.nodes, function (index, item) {
-                var row = '<tr>' +
-                    '<td>' + item.id + '</td>' +
-                    '<td>' + item.group + '</td>' +
-                    '<td>' + item.location + '</td>' +
-                    '<td>' + item.isInfluencer + '</td>' +
-                    '</tr>';
-                tableBody.append(row);
+        function populateTable(filePath) {
+            ['group', 'location', 'is_influencer'].forEach(attribute => {
+                fetch(filePath)
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        var attributeCounts = {};
+
+                        // Count occurrences of each attribute
+                        jsonData.nodes.forEach(function (node) {
+                            var value = node[attribute];
+
+                            // If the attribute is 'is_influencer', count 'true' and 'false' separately
+                            if (attribute === 'is_influencer') {
+                                value = value.toString(); // Convert boolean to string for counting
+                            }
+
+                            attributeCounts[value] = (attributeCounts[value] || 0) + 1;
+                        });
+
+                        // console.log(attributeCounts);
+
+                        // Generate HTML table
+                        var tableHTML = "<table class='table'><thead class='thead-dark'><tr><th>" + attribute.charAt(0).toUpperCase() + attribute.slice(1) + "</th><th>Count</th></tr></thead><tbody>";
+                        for (var value in attributeCounts) {
+                            tableHTML += "<tr><td>" + value + "</td><td>" + attributeCounts[value] + "</td></tr>";
+                        }
+                        tableHTML += "</tbody></table>";
+
+                        // Insert table into respective container
+                        document.getElementById("table-container-" + attribute).innerHTML = tableHTML;
+                    })
+                    .catch(error => console.error('Error fetching JSON:', error));
             });
         }
 
         function loadJSON(selectedItem) {
-            var filePath ="./Graphs/"+selectedItem + '.json';
+            var filePath = "./graphs/" + selectedItem + '.json';
             // console.log("filePath",filePath)
 
             $.ajax({
                 url: filePath,
                 dataType: 'json',
                 success: function (data) {
-                    populateTable(data);
+                    populateTable(filePath);
                 },
                 error: function (xhr, status, error) {
                     console.error('Error loading JSON file:', error);
@@ -150,6 +146,8 @@
             var selectedOption = dropdown.val();
             // loadJSON(selectedOption);
 
+
+
         })
 
         dropdown.on('change', function () {
@@ -159,35 +157,39 @@
         });
 
     </script>
-<script>
-  $(document).ready(function(){
-        $.ajax({
-            type: "GET",
-            url: "http://127.0.0.1:5500/graphs/",
-            success: function(data){
-                var fileList = $("#fileList");
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "http://127.0.0.1:8000/graphs/",
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET',
+                },
+                success: function (data) {
+                    var fileList = $("#fileList");
 
-                var fileNames = $(data).find('a').map(function() {
-                    return $(this).text();
-                }).get();
-                var fileNames = fileNames.filter(function(fileName) {
-                    return fileName.endsWith('.json');
-                });
+                    var fileNames = $(data).find('a').map(function () {
+                        return $(this).text();
+                    }).get();
+                    var fileNames = fileNames.filter(function (fileName) {
+                        return fileName.endsWith('.json');
+                    });
 
-                var fileOptions = $("#dropdown");
+                    var fileOptions = $("#dropdown");
 
-fileNames.forEach(function(jsonFile){
-    jsonFile = jsonFile.replace('.json', '');
+                    fileNames.forEach(function (jsonFile) {
+                        jsonFile = jsonFile.replace('.json', '');
 
-    var option = $("<option></option>").text(jsonFile).val(jsonFile);
-    fileOptions.append(option);
-});
+                        var option = $("<option></option>").text(jsonFile).val(jsonFile);
+                        fileOptions.append(option);
+                    });
 
-                     console.log(fileNames)
-            }
+                    console.log(fileNames)
+                }
+            });
         });
-    });
-</script>
+    </script>
 
     <style>
         .tooltip {
