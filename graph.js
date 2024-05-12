@@ -1,10 +1,14 @@
+
 function ForceGraph({
     nodes, // an iterable of node objects (typically [{id}, …])
     links // an iterable of link objects (typically [{source, target}, …])
 }, {
     nodeId = d => d.id, // given d in nodes, returns a unique identifier (string)
     nodeGroup, // given d in nodes, returns an (ordinal) value for color
+    nodeGroupType,
     nodeGroups, // an array of ordinal values representing the node groups
+    nodeCommunity,
+    nodeInfluence,
     nodeGeolocation, // given d in nodes, return d.location as string
     nodeTitle, // given d in nodes, a title string
     nodeFill = "currentColor", // node stroke fill (if not using a group color encoding)
@@ -36,11 +40,13 @@ function ForceGraph({
     const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
     const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
     const LOC = nodeGeolocation == null ? null : d3.map(nodes, nodeGeolocation);
+    const I = nodeInfluence == null ? null : d3.map(nodes, nodeInfluence);
+    const COM = nodeCommunity == null ? null : d3.map(nodes, nodeCommunity);
 
     console.log("nodes", LOC);
 
     // Replace the input nodes and links with mutable objects for the simulation.
-    nodes = d3.map(nodes, (_, i) => ({ id: N[i], group: G && G[i], location: LOC && LOC[i] }));
+    nodes = d3.map(nodes, (_, i) => ({ id: N[i], group: G && G[i], location: LOC && LOC[i], is_influencer: I && I[i], community: COM && COM[i] }));
     links = d3.map(links, (_, i) => ({ source: LS[i], target: LT[i] }));
 
     // Compute default domains.
@@ -89,11 +95,24 @@ function ForceGraph({
         .selectAll("circle")
         .data(nodes)
         .join("circle")
-        .attr("r", nodeRadius)
+        .attr("r", (d) => {
+            if (nodeGroupType === "influence") {
+                return d.is_influencer === true ? 15 : 5;
+            } else {
+                return nodeRadius;
+            }
+        })
         .call(drag(simulation))
         .on("mouseover", persist_tooltip)
         .on("mouseout", remove_tooltip)
-        .on("click", persist_tooltip);
+        .on("click", persist_tooltip)
+        .attr("opacity", (d) => {
+            if (nodeGroupType === "location") {
+                return d.group === "None" ? "0.2" : "1"
+            } else {
+                return 1;
+            }
+        });
 
     if (W) link.attr("stroke-width", ({ index: i }) => W[i]);
     if (L) link.attr("stroke", ({ index: i }) => L[i]);
@@ -152,34 +171,24 @@ function ForceGraph({
         .attr('fill', 'white')
         .attr('stroke', '#333');
 
-    // function add_tooltip(event, d) {
-    //     console.log("Node clicked:", d); // Log the details of the clicked node to the console
-    //     tooltip.append('text')
-    //         .attr('x', 5)
-    //         .attr('y', 20)
-    //         .text(`ID: ${d.id}`);
-    //     tooltip.append('text')
-    //         .attr('x', 5)
-    //         .attr('y', 40)
-    //         .text(`Group: ${d.group}`);
-    //     tooltip.append('text')
-    //         .attr('x', 5)
-    //         .attr('y', 60)
-    //         .text(`Location: ${d.location}`);
-    //     console.log(tooltip);
-    // }
     function add_tooltip(event, d) {
         const tooltip = d3.select("#tooltip");
-        tooltip.html(`<strong>ID:</strong> ${d.id}<br><strong>Group:</strong> ${d.group}<br><strong>Location:</strong> ${d.location}`);
-        tooltip.style("left", event.pageX + "px")
-               .style("top", event.pageY + "px")
-               .style("display", "block");
+        tooltip.html(`
+        <strong>ID:</strong> ${d.id}<br>
+        <strong>Community:</strong>${d.community}<br>
+        <strong>Location:</strong> ${d.location}<br>
+        <strong>Influence:</strong> ${d.is_influencer}
+        `
+        );
+        tooltip.style("left", event.clientX + "px")
+            .style("top", event.clientY + "px")
+            .style("display", "block");
     }
-    
+
     function remove_tooltip() {
         d3.select("#tooltip").style("display", "none");
     }
-    
+
     function persist_tooltip(event, d) {
         add_tooltip(event, d);
     }
@@ -187,15 +196,15 @@ function ForceGraph({
     //     // Call the add_tooltip function
     //     add_tooltip(event, d);
     // }
-    
+
     // function remove_tooltip(event, d) {
     //     // Clear any existing text
     //     tooltip.selectAll('text').remove();
-    
+
     //     // Hide the tooltip
     //     tooltip.style('display', 'none');
     // }
-    
+
 
     // function persist_tooltip(event, d) {
     //     add_tooltip(event, d);
@@ -210,36 +219,47 @@ function ForceGraph({
     return Object.assign(svg.node(), { scales: { color } });
 }
 
-d3.json("./2024electionindia.json").then(function (jsonData) {
-    console.log("JSON data fetched:", jsonData);
-    // Create D3.js chart with fetched JSON data
-    const chart = ForceGraph(jsonData, {
-        nodeId: d => d.id,
-        nodeGroup: d => d.group,
-        nodeGeolocation: d => d.location,
-        nodeTitle: d => `${d.id}\n${d.group}`,
-        linkStrokeWidth: l => Math.sqrt(l.weight),
-    });
+// d3.json("./2024electionindia.json").then(function (jsonData) {
+//     console.log("JSON data fetched:", jsonData);
+//     // Create D3.js chart with fetched JSON data
+//     const chart = ForceGraph(jsonData, {
+//         nodeId: d => d.id,
+//         nodeGroup: d => d.group,
+//         nodeGeolocation: d => d.location,
+//         nodeTitle: d => `${d.id}\n${d.group}`,
+//         linkStrokeWidth: l => Math.sqrt(l.weight),
+//     });
 
-    // Select the chart container and append the chart to it
-    d3.select("#chart").append(() => chart);
+//     // Select the chart container and append the chart to it
+//     d3.select("#chart").append(() => chart);
 
-}).catch(function (error) {
-    // Handle errors if any
-    console.error("Error fetching JSON data:", error);
-});
+// }).catch(function (error) {
+//     // Handle errors if any
+//     console.error("Error fetching JSON data:", error);
+// });
 
 
 function loadGraph(selectedItem) {
-    const filePath = `./${selectedItem}.json`;
+    const filePath = `./Graphs/${selectedItem.file}.json`;
 
     d3.json(filePath)
         .then(function (jsonData) {
-            console.log(`JSON data fetched for ${selectedItem}:`, jsonData);
+            console.log(`JSON data fetched for ${selectedItem.file}:`, jsonData);
 
             const chart = ForceGraph(jsonData, {
                 nodeId: d => d.id,
-                nodeGroup: d => d.group,
+                nodeGroup: d => {
+                    if (selectedItem.grouping === "community") {
+                        return d.group;
+                    } else if (selectedItem.grouping === "location") {
+                        return d.location;
+                    } else if (selectedItem.grouping === "influence") {
+                        return d.is_influencer;
+                    }
+                },
+                nodeGroupType: selectedItem.grouping,
+                nodeCommunity: d => d.group,
+                nodeInfluence: d => d.is_influencer,
                 nodeGeolocation: d => d.location,
                 nodeTitle: d => `${d.id}\n${d.group}`,
                 linkStrokeWidth: l => Math.sqrt(l.weight),
@@ -250,7 +270,7 @@ function loadGraph(selectedItem) {
             d3.select("#chart").append(() => chart);
         })
         .catch(function (error) {
-            console.error(`Error fetching JSON data for ${selectedItem}:`, error);
+            console.error(`Error fetching JSON data for ${selectedItem.file}:`, error);
         });
 }
 
@@ -258,11 +278,28 @@ function updateGraph(selectedItem) {
     loadGraph(selectedItem);
 }
 
-loadGraph("part1");
 
 const dropdown = document.getElementById("dropdown");
 
-dropdown.addEventListener("change", function() {
+const dropdown_graph = document.getElementById("dropdown_graph");
+
+dropdown.addEventListener("change", function () {
     const selectedItem = dropdown.value;
-    updateGraph(selectedItem); 
+    const grouping = dropdown_graph.value;
+    updateGraph({
+        file: selectedItem,
+        grouping: grouping
+    });
+    loadJSON(selectedItem);
+
+});
+
+dropdown_graph.addEventListener("change", function () {
+    const selectedItem = dropdown.value;
+    const grouping = dropdown_graph.value;
+    updateGraph({
+        file: selectedItem,
+        grouping: grouping
+    });
+    loadJSON(selectedItem);
 });
