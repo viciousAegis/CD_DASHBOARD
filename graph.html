@@ -21,7 +21,16 @@
     <style>
         #mainBody {
             height: 100vh;
-        }
+        };
+        #main {
+    width: 300%; 
+    height: 300%;
+    /* min-width: 200px; 
+    min-height: 200px;  */
+    border: 1px solid #ccc; 
+    overflow: hidden; 
+}
+
     </style>
 </head>
 
@@ -42,7 +51,6 @@
             <select id="dropdown">
                 <option value="Select Option">Select</option>
 
-                <!-- Add more options as needed -->
             </select>
         </div>
         <div class="col-md-12 justify-center align-center">
@@ -58,8 +66,8 @@
 
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+    <div class="row justify-content-center main">
+        <div class="col-md-7">
             <div id="chart" class="shadow p-3 mb-5 bg-white rounded">
             </div>
             <div id="tooltip"
@@ -161,7 +169,7 @@
         $(document).ready(function () {
             $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1:8000/graphs/",
+                url: "http://127.0.0.1:5500/graphs/",
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
