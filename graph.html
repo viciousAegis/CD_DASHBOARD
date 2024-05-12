@@ -58,46 +58,47 @@
     <div class="container">
         <div id="table-container-group" class="scrollable-table"></div>
         <div id="table-container-location" class="scrollable-table"></div>
-        <div id="table-container-is_influencer"></div>
+        <div id="table-container-is_influencer" class="scrollable-table"></div>
     </div>
 
 
     <script>
-        // JavaScript code goes here
-        // Fetch and display table for each attribute
-        // Fetch and display table for each attribute
-['group', 'location', 'is_influencer'].forEach(attribute => {
-    fetch('bollywood.json')
-    .then(response => response.json())
-    .then(jsonData => {
-        var attributeCounts = {};
-
-        // Count occurrences of each attribute
-        jsonData.nodes.forEach(function(node) {
-            var value = node[attribute];
-
-            // If the attribute is 'is_influencer', count 'true' and 'false' separately
-            if (attribute === 'is_influencer') {
-                value = value.toString(); // Convert boolean to string for counting
-            }
-
-            attributeCounts[value] = (attributeCounts[value] || 0) + 1;
-        });
-
-        // console.log(attributeCounts);
-
-        // Generate HTML table
-        var tableHTML = "<table class='table'><thead class='thead-dark'><tr><th>" + attribute.charAt(0).toUpperCase() + attribute.slice(1) + "</th><th>Count</th></tr></thead><tbody>";
-        for (var value in attributeCounts) {
-            tableHTML += "<tr><td>" + value + "</td><td>" + attributeCounts[value] + "</td></tr>";
+        // Function to print row details to console
+        function printRowDetails(attribute, value, count) {
+            console.log("('" + value + "', " + count + ")");
         }
-        tableHTML += "</tbody></table>";
 
-        // Insert table into respective container
-        document.getElementById("table-container-" + attribute).innerHTML = tableHTML;
-    })
-    .catch(error => console.error('Error fetching JSON:', error));
-});
+        // Fetch and display table for each attribute
+        ['group', 'location', 'is_influencer'].forEach(attribute => {
+            fetch('bollywood.json')
+            .then(response => response.json())
+            .then(jsonData => {
+                var attributeCounts = {};
+
+                // Count occurrences of each attribute
+                jsonData.nodes.forEach(function(node) {
+                    var value = node[attribute];
+
+                    // If the attribute is 'is_influencer', count 'true' and 'false' separately
+                    if (attribute === 'is_influencer') {
+                        value = value.toString(); // Convert boolean to string for counting
+                    }
+
+                    attributeCounts[value] = (attributeCounts[value] || 0) + 1;
+                });
+
+                // Generate HTML table with Bootstrap classes and custom font
+                var tableHTML = "<table class='table'><thead class='thead-dark sticky-top'><tr><th>" + attribute.charAt(0).toUpperCase() + attribute.slice(1) + "</th><th>Count</th></tr></thead><tbody>";
+                for (var value in attributeCounts) {
+                    tableHTML += "<tr onclick='printRowDetails(\"" + attribute + "\", \"" + value + "\", " + attributeCounts[value] + ")'><td>" + value + "</td><td>" + attributeCounts[value] + "</td></tr>";
+                }
+                tableHTML += "</tbody></table>";
+
+                // Insert table into respective container
+                document.getElementById("table-container-" + attribute).innerHTML = tableHTML;
+            });
+        })
+        .catch(error => console.error('Error fetching JSON:', error));
 
     </script>
 
