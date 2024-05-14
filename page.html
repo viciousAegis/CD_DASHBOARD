@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Detection</title>
+</head>
+<body>
+    <h2>Community Detection</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="file">Upload CSV File:</label><br>
+        <input type="file" id="file" name="file"><br><br>
+        <label for="algo">Choose an Algorithm:</label><br>
+        <select id="algo" name="algo">
+            <option value="louvain">Louvain</option>
+            <option value="lpa">LPA</option>
+            <option value="greedy_modularity">Greedy Modularity</option>
+            <option value="asyn_lpa">Asynchronous LPA</option>
+        </select><br><br>
+        <button type="button" onclick="convert()">Convert</button>
+    </form>
+
+    <script>
+        function convert() {
+            var fileInput = document.getElementById('file');
+            var file = fileInput.files[0];
+            var algoSelect = document.getElementById('algo');
+            var algo = algoSelect.value;
+
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://192.168.1.21:5002/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('File upload failed');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                fetch('http://192.168.1.21:5002/community', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fname: file.name,
+                        algo: algo
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Community detection failed');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log(data);
+                    alert('Community detection completed.');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error occurred during community detection.');
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error occurred during file upload.');
+            });
+        }
+    </script>
+</body>
+</html>
